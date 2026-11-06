@@ -1,34 +1,58 @@
-"""Named steps in the reflective document QA pipeline."""
-from rag_engine import Answer, answer_question
+"""LangGraph node implementations for reflective retrieval and answer verification."""
+from __future__ import annotations
+from typing import TypedDict
 
 
-def retrieve(state: dict, retriever) -> dict:
-    return {**state, "documents": retriever.search(state["question"])}
+class GraphState(TypedDict, total=False):
+    question: str
+    original_question: str
+    documents: list[str]
+    generation: str
+    attempts: int
+    max_attempts: int
+    verified: bool
 
 
-def grade_documents(state: dict, judge) -> dict:
-    relevant = [
-        passage for passage in state.get("documents", [])
-        if judge.relevant(state["question"], passage)
-    ]
-    return {**state, "documents": relevant}
+def retrieve(state: GraphState, retriever) -> dict:
+    """Retrieve passages and count one retrieval attempt."""
+    return {
+        "documents": retriever.search(state["question"], limit=5),
+        "attempts": state.get("attempts", 0) + 1,
+    }
 
 
-def transform_query(state: dict, judge) -> dict:
-    return {**state, "question": judge.rewrite(state["question"])}
+def grade_documents(state: GraphState, judge) -> dict:
+    """Filter passages using the LLM relevance grader."""
+    relevant = [doc for doc in state.get("documents", []) if judge.relevant(state["question"], doc)]
+    return {"documents": relevant}
 
 
-def generate(state: dict, judge) -> dict:
-    return {**state, "generation": judge.generate(state["question"], state["documents"])}
+def transform_query(state: GraphState, judge) -> dict:
+    """Rewrite the query to improve retrieval on the next attempt."""
+    return {"question": judge.rewrite(state["question"])}
 
 
-def decide_to_generate(state: dict) -> str:
-    return "generate" if state.get("documents") else "transform_query"
+def generate(state: GraphState, judge) -> dict:
+    """Generate an answer using only retained evidence."""
+    return {"generation": judge.generate(state["original_question"], state["documents"])}
 
 
-def grade_generation_v_documents_and_question(state: dict, judge) -> str:
+def verify_generation(state: GraphState, judge) -> dict:
+    """Check groundedness and whether the answer addresses the original question."""
     answer = state.get("generation", "")
     docs = state.get("documents", [])
-    if not judge.grounded(answer, docs):
-        return "not supported"
-    return "useful" if judge.useful(state["question"], answer) else "not useful"
+    passed = bool(answer and judge.grounded(answer, docs) and judge.useful(state["original_question"], answer))
+    return {"verified": passed}
+
+
+def decide_to_generate(state: GraphState) -> str:
+    """Choose generation, query rewrite, or stop when retry budget is exhausted."""
+    if state.get("documents"):
+        return "generate"
+    return "transform_query" if state["attempts"] < state["max_attempts"] else "finish"
+
+
+def decide_after_verification(state: GraphState) -> str:
+    if state.get("verified"):
+        return "finish"
+    return "transform_query" if state["attempts"] < state["max_attempts"] else "finish"
