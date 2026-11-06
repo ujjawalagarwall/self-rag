@@ -1,6 +1,6 @@
 # Self-RAG: Reflective Document Question Answering
 
-A Python + Streamlit document-question-answering app that retrieves relevant PDF passages, checks retrieval relevance, generates grounded answers, and evaluates whether an answer is supported by the source text. It can rewrite questions and retry retrieval when evidence is insufficient.
+A Python + Streamlit + LangGraph document-question-answering app that retrieves relevant PDF passages, checks retrieval relevance, generates grounded answers, and evaluates whether an answer is supported by the source text. It can rewrite questions and retry retrieval when evidence is insufficient.
 
 ## Architecture
 
@@ -35,13 +35,13 @@ The first query requires internet access for API requests; OpenAI usage may incu
 
 - `app.py`: Streamlit interface
 - `main.py`: command-line entry point
-- `document_processing.py`: text chunking
+- `document_processing.py`: LangChain recursive text chunking
 - `pdf_utils.py`: PDF text extraction
 - `vectorstore.py`: vector retrieval adapter
 - `nodes.py`: named retrieval and reflection steps
 - `prompts.py`: prompt definitions
-- `workflow.py`: workflow factory
-- `rag_engine.py`: bounded retrieval and verification loop
+- `workflow.py`: LangGraph StateGraph construction and execution
+- `rag_engine.py`: independent bounded-loop implementation and typed Answer result
 - `document_store.py`: PDF processing and Chroma indexing
 - `llm_checks.py`: LLM-based relevance, grounding, and usefulness checks
 - `tests/test_rag_engine.py`: offline tests
@@ -51,6 +51,6 @@ The first query requires internet access for API requests; OpenAI usage may incu
 
 - Uploaded documents are processed locally for extraction and then sent to OpenAI for embedding and generation; do not upload confidential PDFs without permission.
 - LLM assessments are probabilistic, not formal factual guarantees.
-- A small retry budget prevents infinite re-querying or regeneration.
+- A LangGraph StateGraph orchestrates retrieval, grading, rewriting, generation and verification with a bounded retry budget.
 - No recall, context relevance, faithfulness, or performance scores are asserted without a separate evaluation run.
 
