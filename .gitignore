@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.pdf
+*.sqlite3
+chroma_db/
+.DS_Store
+.streamlit/secrets.toml
