@@ -2,8 +2,6 @@
 
 A Python + Streamlit document-question-answering app that retrieves relevant PDF passages, checks retrieval relevance, generates grounded answers, and evaluates whether an answer is supported by the source text. It can rewrite questions and retry retrieval when evidence is insufficient.
 
-> **Provenance:** This is a separately written implementation of a common self-reflective RAG pattern. The architecture was studied with reference to [AnveshKumar123/self_ragg](https://github.com/AnveshKumar123/self_ragg). It is **not** a claim of authorship of that repository. Do not present unverified evaluation metrics as results from this implementation.
-
 ## Architecture
 
 1. Extract and chunk text from an uploaded PDF.
@@ -49,6 +47,3 @@ The first query requires internet access for API requests; OpenAI usage may incu
 - A small retry budget prevents infinite re-querying or regeneration.
 - No recall, context relevance, faithfulness, or performance scores are asserted without a separate evaluation run.
 
-## Attribution
-
-The public project [AnveshKumar123/self_ragg](https://github.com/AnveshKumar123/self_ragg) was used as an architecture reference. This repository contains independently authored code rather than a verbatim copy. The original did not include a license at the time of review.
