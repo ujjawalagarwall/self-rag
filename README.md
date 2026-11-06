@@ -44,8 +44,21 @@ The first query requires internet access for API requests; OpenAI usage may incu
 - `rag_engine.py`: independent bounded-loop implementation and typed Answer result
 - `document_store.py`: PDF processing and Chroma indexing
 - `llm_checks.py`: LLM-based relevance, grounding, and usefulness checks
-- `tests/test_rag_engine.py`: offline tests
+- `tests/test_rag_engine.py`: tests for the standalone reference loop
+- `tests/test_workflow.py`: tests for the LangGraph application workflow
 - `.env.example`: safe example configuration; never commit a real API key
+
+## Tests
+
+Run the offline test suite after installing dependencies:
+
+```bash
+python -m pytest -q
+```
+
+These tests use fake retrieval and grading components; they do not establish end-to-end API correctness or benchmark performance.
+
+![Self-RAG workflow](image.png)
 
 ## Safety and limitations
 
