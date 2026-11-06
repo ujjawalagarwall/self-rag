@@ -31,14 +31,21 @@ streamlit run app.py
 
 The first query requires internet access for API requests; OpenAI usage may incur charges. This project has not been deployed or externally benchmarked.
 
-## Files
+## Project structure
 
-- `app.py`: Streamlit UI and session initialization
-- `rag_engine.py`: retrieval and self-reflection loop
-- `document_store.py`: PDF extraction, chunking, embeddings, and retrieval
-- `llm_checks.py`: structured LLM assessments and grounded generation
-- `tests/test_rag_engine.py`: offline tests of retry/grounding control flow
-- `.env.example`: placeholder configuration; never commit your real API key
+- `app.py`: Streamlit interface
+- `main.py`: command-line entry point
+- `document_processing.py`: text chunking
+- `pdf_utils.py`: PDF text extraction
+- `vectorstore.py`: vector retrieval adapter
+- `nodes.py`: named retrieval and reflection steps
+- `prompts.py`: prompt definitions
+- `workflow.py`: workflow factory
+- `rag_engine.py`: bounded retrieval and verification loop
+- `document_store.py`: PDF processing and Chroma indexing
+- `llm_checks.py`: LLM-based relevance, grounding, and usefulness checks
+- `tests/test_rag_engine.py`: offline tests
+- `.env.example`: safe example configuration; never commit a real API key
 
 ## Safety and limitations
 
