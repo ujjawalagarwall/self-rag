@@ -9,7 +9,7 @@ from openai import OpenAI
 
 from document_store import DocumentRetriever, chunk_text, extract_pdf_text
 from llm_checks import ReflectiveLLM
-from rag_engine import answer_question
+from workflow import create_workflow, run_question
 
 load_dotenv()
 st.set_page_config(page_title="Self-RAG Document Q&A", page_icon="📄")
@@ -47,7 +47,8 @@ question = st.text_input("Ask a question about this PDF")
 if st.button("Ask", disabled=not question.strip()):
     try:
         with st.spinner("Retrieving and verifying..."):
-            response = answer_question(question, st.session_state.retriever, st.session_state.judge)
+            workflow = create_workflow(st.session_state.retriever, st.session_state.judge)
+            response = run_question(workflow, question)
         st.subheader("Answer")
         st.write(response.text)
         st.caption(f"Attempts: {response.attempts} • LLM verification: {'passed' if response.verified else 'not passed'}")
