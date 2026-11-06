@@ -41,11 +41,12 @@ The first query requires internet access for API requests; OpenAI usage may incu
 - `nodes.py`: named retrieval and reflection steps
 - `prompts.py`: prompt definitions
 - `workflow.py`: LangGraph StateGraph construction and execution
-- `rag_engine.py`: independent bounded-loop implementation and typed Answer result
-- `document_store.py`: PDF processing and Chroma indexing
+- `rag_engine.py`: shared typed Answer result
+- `document_store.py`: PDF validation and batched Chroma indexing
 - `llm_checks.py`: LLM-based relevance, grounding, and usefulness checks
-- `tests/test_rag_engine.py`: tests for the standalone reference loop
-- `tests/test_workflow.py`: tests for the LangGraph application workflow
+- `tests/test_rag_engine.py`: result type test
+- `tests/test_workflow.py`: LangGraph workflow tests
+- `tests/test_document_processing.py`: PDF validation and text chunking tests
 - `.env.example`: safe example configuration; never commit a real API key
 
 ## Tests
@@ -64,6 +65,8 @@ These tests use fake retrieval and grading components; they do not establish end
 
 - Uploaded documents are processed locally for extraction and then sent to OpenAI for embedding and generation; do not upload confidential PDFs without permission.
 - LLM assessments are probabilistic, not formal factual guarantees.
+- PDF uploads are limited to 10 MB and 100 pages; indexing is capped at 500 chunks.
+- OpenAI requests use a 30-second timeout and two SDK retries in the Streamlit app.
 - A LangGraph StateGraph orchestrates retrieval, grading, rewriting, generation and verification with a bounded retry budget.
 - No recall, context relevance, faithfulness, or performance scores are asserted without a separate evaluation run.
 
