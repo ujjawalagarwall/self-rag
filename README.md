@@ -59,7 +59,7 @@ python -m pytest -q
 
 These tests use fake retrieval and grading components; they do not establish end-to-end API correctness or benchmark performance.
 
-![Self-RAG workflow](image.png)
+![Self-RAG workflow](workflow-diagram.svg)
 
 ## Safety and limitations
 
